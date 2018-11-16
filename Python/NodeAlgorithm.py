@@ -4,13 +4,14 @@ class Node:
 
 	# When seeing a node within 'debounce_time' seconds
 	debounce_time = 30
-	debounce_buffer = {}
+
 	# The maximum number of seconds a neighbor's sighting will remain in the buffer
-	neighbour_buffer_time = 30 * 60
+	neighbour_buffer_time = 6000 * 60
 
 	def __init__(self, ID: str):
 		# list of mac sightings by neighbors
 		self.Neighbors = {}
+		self.debounce_buffer = {}
 		# list of all the neighbours to simulating broadcasting to them
 		self.list_of_neighbors = {}
 		self.ID = ID
@@ -35,10 +36,15 @@ class Node:
 		self.debounce_buffer[mac_adress] = timestamp
 
 		# check for stale entries in the buffer
+		old_keys = []
 		for entry in self.debounce_buffer:
 			# if the node is aalready older, delete entry
 			if timestamp - self.debounce_buffer[entry]  > self.debounce_time:
-				self.debounce_buffer.pop(entry)
+				old_keys.append(entry)
+
+		for keys in old_keys:
+			self.debounce_buffer.pop(keys)
+		old_keys.clear()
 
 		if not ignore:
 			self.removeOldSightings(timestamp)
