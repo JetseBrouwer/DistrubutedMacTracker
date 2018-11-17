@@ -24,6 +24,8 @@ class Simulator:
 		while round(float(row[0])) < self.startTime:
 			row = next(self.readers[-1])
 
+		print("Node", node.ID, "Starts on", time.strftime('%Y/%m/%d %H:%M:%S', time.gmtime(float(row[0]))), float(row[0]))
+
 		# gets the first line
 		self.nexts.append(row)
 
@@ -51,7 +53,8 @@ class Simulator:
 			del self.nexts[nextNode]
 
 		# end loop
-		if nextNode > self.endTime:
+		if timeReturn > self.endTime:
+			print("Node", nodeReturn.ID, "Stops on", time.strftime('%Y/%m/%d %H:%M:%S', time.gmtime(timeReturn)), timeReturn)
 			raise IndexError()
 
 		# Remove empty mac
