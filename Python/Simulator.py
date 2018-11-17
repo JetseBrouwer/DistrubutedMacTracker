@@ -8,14 +8,23 @@ class Simulator:
 	nexts = []
 	index = 0
 
-	def __init__(self):
+
+	def __init__(self, startTime, endTime, thresholdRSSI):
+		self.startTime = startTime
+		self.endTime = endTime
+		self.thresholdRSSI = thresholdRSSI
 		pass
 
 	def loadNode(self,  csvlocation, node):
 		f = open(csvlocation, newline='')
 		self.readers.append(csv.reader(f, delimiter='\t'))
 		self.nodes.append(node)
-		row = next(self.readers[-1])  # gets the first line
+
+		row = next(self.readers[-1])
+		while round(float(row[0])) < self.startTime:
+			row = next(self.readers[-1])
+
+		# gets the first line
 		self.nexts.append(row)
 
 	def getNext(self):
@@ -29,8 +38,9 @@ class Simulator:
 
 		# Get mac and time from newest in next list
 		macReturn = self.nexts[nextNode][1]
-		timeReturn = float(self.nexts[nextNode][0])
+		timeReturn = round(float(self.nexts[nextNode][0]))
 		nodeReturn = self.nodes[nextNode]
+		RSSIReturn = int(self.nexts[nextNode][4])
 
 		# Shift newest next
 		try:
@@ -40,8 +50,12 @@ class Simulator:
 			del self.nodes[nextNode]
 			del self.nexts[nextNode]
 
+		# end loop
+		if nextNode > self.endTime:
+			raise IndexError()
+
 		# Remove empty mac
-		if macReturn == '':
+		if macReturn == '' or RSSIReturn < self.thresholdRSSI:
 			timeReturn, macReturn, nodeReturn = self.getNext()
 		else:
 			# print(nextNode, time.strftime('%m/%d/%Y %H:%M:%S', timeReturn), macReturn)
