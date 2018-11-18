@@ -2,8 +2,8 @@ import time
 from NodeAlgorithm import Node
 from Simulator import Simulator
 
-import numpy as np
-import matplotlib.mlab as mlab
+import numpy
+# import matplotlib.mlab as mlab
 import matplotlib.pyplot as plt
 
 
@@ -28,20 +28,20 @@ patricia.setNeighbors([belg, memphis])
 memphis.setNeighbors([belg, patricia])
 belg.setNeighbors([patricia, memphis])
 
-
-simulator = Simulator(1542294900, 1542298500, -150)
-simulator.loadNode("Measurements/2018-11-15/output_jetse.csv", patricia)
-simulator.loadNode("Measurements/2018-11-15/output_david.csv", belg)
-simulator.loadNode("Measurements/2018-11-15/output_nielsch.csv", memphis)
+#
+# simulator = Simulator(1542294900, 1542298500, -150)
+# simulator.loadNode("Measurements/2018-11-15/output_jetse.csv", patricia)
+# simulator.loadNode("Measurements/2018-11-15/output_david.csv", belg)
+# simulator.loadNode("Measurements/2018-11-15/output_nielsch.csv", memphis)
 
 
 # simulator.loadNode("Measurements/2018-11-15/klein.csv", 5)
 
-#simulator = Simulator(1542294900, 1542298500, -150)
-# simulator = Simulator(1542447000, 1542450600, -150)
-# simulator.loadNode("Measurements/2018-11-17/output_jetse.csv", patricia)
-# simulator.loadNode("Measurements/2018-11-17/output_david.csv", belg)
-# simulator.loadNode("Measurements/2018-11-17/output_nielsch.csv", memphis)
+
+simulator = Simulator(1542447000, 1542450600, -150)
+simulator.loadNode("Measurements/2018-11-17/output_jetse.csv", patricia)
+simulator.loadNode("Measurements/2018-11-17/output_david.csv", belg)
+simulator.loadNode("Measurements/2018-11-17/output_nielsch.csv", memphis)
 
 i = 0
 while True:
@@ -68,10 +68,27 @@ plt.title(r'$\mathrm{Histogram\ of\ IQ:}\ \mu=100,\ \sigma=15$')
 plt.grid(True)
 
 plt.show()
-print("Memphis tracked: ", len(memphis.Direct))
-print("Patricia tracked: ", len(patricia.Direct))
-print("Belg tracked: ", len(belg.Direct))
 
+# EXport Niels' measurmenets
+print("jetse-> niels", len(memphis.Direct["patricia"]))
+print(memphis.Direct["patricia"][0])
+numpy.savetxt("jetse-to-niels.csv", memphis.Direct["patricia"], delimiter=", ", fmt="%s")
+print("david-> niels", len(memphis.Direct["belg"]))
+numpy.savetxt("david-to-niels.csv", memphis.Direct["belg"], delimiter=", ", fmt="%s")
+
+# Export Jetse's measurements
+print("niels-> jetse", len(patricia.Direct["memphis"]))
+numpy.savetxt("niels-to-jetse.csv", patricia.Direct["memphis"], delimiter=", ", fmt="%s")
+print("david-> jetse", len(patricia.Direct["belg"]))
+numpy.savetxt("david-to-jetse.csv", patricia.Direct["belg"], delimiter=", ", fmt="%s")
+
+#export
+print("jetse-> david", len(belg.Direct["patricia"]))
+numpy.savetxt("jetse-to-david.csv", belg.Direct["patricia"], delimiter=", ", fmt="%s")
+print("niels-> david", len(belg.Direct["memphis"]))
+numpy.savetxt("niels-to-david.csv", belg.Direct["memphis"], delimiter=", ", fmt="%s")
+
+print("done")
 # print(time.strftime('%Y/%m/%d %H:%M:%S', time.gmtime(1542447000)))
 # print(time.strftime('%Y/%m/%d %H:%M:%S', time.gmtime(1542450600)))
 # # utc_time = time.strptime("2018/11/17 09:30:00 ", "%Y/%m/%d %H:%M:%S")

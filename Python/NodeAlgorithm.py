@@ -17,21 +17,23 @@ class Node:
 		self.list_of_neighbors = {}
 		self.ID = ID
 		self.Indirect = []
-		self.Direct = []
+		self.Direct = {}
 
 
 
 	def setNeighbors(self, list_of_neighbors):
 		# list of all the neighbours to simulating broadcasting to them
 		self.list_of_neighbors = list_of_neighbors[:]
+		for nodes in list_of_neighbors:
+			self.Direct[nodes.ID] = []
 
 	def broadcastPacket(self, timestamp: int, mac_address: str):
 		for neighbor in self.list_of_neighbors:
 			neighbor.onBroadcast(self.ID, timestamp, mac_address,)
 
 	def onPacket(self, timestamp: int, mac_adress: str, rssi: int):
-		if self.ID == "memphis" or (self.ID == "belg" and rssi < -85):
-			return
+		# if self.ID == "belg":
+		# 	return
 		ignore = False
 		# if it has been seen before            and  the difference between then and now is smaller then the debounce, ignore
 		if (mac_adress in self.debounce_buffer) and (timestamp - self.debounce_buffer[mac_adress] < self.debounce_time):
@@ -60,7 +62,8 @@ class Node:
 				for index, entries in enumerate(self.Neighbors[neighbor]):
 					if entries[0] == mac_adress:
 						if timestamp-entries[1] > 1:
-							self.Direct.append((entries[0], entries[1], timestamp, neighbor, (timestamp-entries[1])))
+							# self.Direct.append((entries[0], entries[1], timestamp, neighbor, (timestamp-entries[1])))
+							self.Direct[neighbor].append((entries[0], entries[1], timestamp, neighbor, (timestamp - entries[1])))
 							self.total_rssi_list.append(rssi)
 						self.Neighbors[neighbor].pop(index)
 						# print("direct found")
@@ -69,7 +72,6 @@ class Node:
 			# Inform the other nodes about your sighting
 			self.broadcastPacket(timestamp, mac_adress)
 
-
 	def removeOldSightings(self, timestamp: int):
 		# Check for any entry older then
 		for neighbor in self.Neighbors:
@@ -77,7 +79,6 @@ class Node:
 			while (len(self.Neighbors[neighbor]) and timestamp - self.Neighbors[neighbor][0][1] > self.neighbour_buffer_time):
 				self.Neighbors[neighbor].pop(0)
 				# print("deleting old entry: ", )
-
 
 	def onBroadcast(self, sender_id, timestamp: int, mac_adress: str):
 		self.removeOldSightings(timestamp)
@@ -96,7 +97,6 @@ class Node:
 					# print("indirect found")
 
 		self.Neighbors[sender_id].append((mac_adress, timestamp))
-
 
 
 if __name__ == '__main__':
