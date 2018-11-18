@@ -4,6 +4,7 @@ class Node:
 
 	# When seeing a node within 'debounce_time' seconds
 	debounce_time = 30
+	total_rssi_list = []
 
 	# The maximum number of seconds a neighbor's sighting will remain in the buffer
 	neighbour_buffer_time = 30 * 60
@@ -28,7 +29,9 @@ class Node:
 		for neighbor in self.list_of_neighbors:
 			neighbor.onBroadcast(self.ID, timestamp, mac_address,)
 
-	def onPacket(self, timestamp: int, mac_adress: str):
+	def onPacket(self, timestamp: int, mac_adress: str, rssi: int):
+		if self.ID == "memphis" or (self.ID == "belg" and rssi < -85):
+			return
 		ignore = False
 		# if it has been seen before            and  the difference between then and now is smaller then the debounce, ignore
 		if (mac_adress in self.debounce_buffer) and (timestamp - self.debounce_buffer[mac_adress] < self.debounce_time):
@@ -58,6 +61,7 @@ class Node:
 					if entries[0] == mac_adress:
 						if timestamp-entries[1] > 1:
 							self.Direct.append((entries[0], entries[1], timestamp, neighbor, (timestamp-entries[1])))
+							self.total_rssi_list.append(rssi)
 						self.Neighbors[neighbor].pop(index)
 						# print("direct found")
 
