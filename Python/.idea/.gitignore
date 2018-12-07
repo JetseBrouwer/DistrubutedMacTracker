@@ -1,0 +1,8 @@
+<<<<<<< HEAD
+*.xml
+=======
+/Python.iml
+/misc.xml
+/vcs.xml
+/workspace.xml
+>>>>>>> origin/develop
